@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class ResumeOptimizerConfig(AppConfig):
-    name = 'resume_optimizer'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "resume_optimizer"

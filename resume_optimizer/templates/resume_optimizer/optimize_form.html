@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Optimizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f7f7f7;
+            color: #222;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        form {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 420px;
+            font-family: Menlo, Monaco, Consolas, monospace;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 24px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            background: #111;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        .errors {
+            background: #ffecec;
+            border: 1px solid #ffb3b3;
+            color: #9b0000;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .hint {
+            color: #777;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Resume Optimizer</h1>
+    <p class="subtitle">
+        Paste your resume JSON, choose a target role, and run the diagnoser, recruiter review, and rewriter.
+    </p>
+
+    {% if errors %}
+        <div class="errors">
+            <strong>Fix these errors:</strong>
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="row">
+            <div>
+                <label for="target_role">Target role</label>
+                <input
+                    id="target_role"
+                    name="target_role"
+                    value="{{ target_role|default:'Software Developer Intern' }}"
+                    placeholder="Software Developer Intern"
+                >
+            </div>
+
+            <div>
+                <label for="industry">Industry</label>
+                <input
+                    id="industry"
+                    name="industry"
+                    value="{{ industry|default:'Agriculture Technology' }}"
+                    placeholder="Agriculture Technology"
+                >
+            </div>
+
+            <div>
+                <label for="seniority">Seniority</label>
+                <select id="seniority" name="seniority">
+                    <option value="junior" {% if seniority == "junior" or not seniority %}selected{% endif %}>Junior</option>
+                    <option value="mid" {% if seniority == "mid" %}selected{% endif %}>Mid</option>
+                    <option value="senior" {% if seniority == "senior" %}selected{% endif %}>Senior</option>
+                    <option value="lead" {% if seniority == "lead" %}selected{% endif %}>Lead</option>
+                </select>
+            </div>
+        </div>
+
+        <label for="target_companies">Target companies</label>
+        <input
+            id="target_companies"
+            name="target_companies"
+            value="{{ target_companies|default:'Canadian Sheep Federation, AbaData, AltaML' }}"
+            placeholder="Company 1, Company 2, Company 3"
+        >
+        <div class="hint">Separate companies with commas. This field is optional.</div>
+
+        <label for="resume_json">Resume JSON</label>
+        <textarea id="resume_json" name="resume_json">{{ sample_resume_json }}</textarea>
+
+        <button type="submit">Optimize Resume</button>
+    </form>
+</body>
+</html>

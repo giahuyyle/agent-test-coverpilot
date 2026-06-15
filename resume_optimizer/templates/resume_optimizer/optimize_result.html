@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Optimizer Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f7f7f7;
+            color: #222;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            margin-bottom: 24px;
+        }
+
+        .issue,
+        .change,
+        .keyword {
+            border-top: 1px solid #eee;
+            padding-top: 14px;
+            margin-top: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: #eee;
+            margin-left: 8px;
+        }
+
+        .high {
+            background: #ffe0e0;
+            color: #9b0000;
+        }
+
+        .medium {
+            background: #fff3cd;
+            color: #7a5a00;
+        }
+
+        .low {
+            background: #e8f4ff;
+            color: #004b7a;
+        }
+
+        pre {
+            background: #111;
+            color: #f5f5f5;
+            padding: 18px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+
+        .path {
+            font-family: Menlo, Monaco, Consolas, monospace;
+            color: #555;
+            font-size: 13px;
+        }
+
+        .before {
+            color: #9b0000;
+        }
+
+        .after {
+            color: #006b2f;
+        }
+
+        a.button {
+            display: inline-block;
+            margin-bottom: 24px;
+            padding: 10px 14px;
+            background: #111;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Resume Optimizer Result</h1>
+    <p class="subtitle">Diagnosis, recruiter analysis, and rewrite result.</p>
+
+    <a class="button" href="{% url 'optimize_resume_ui' %}">Run another optimization</a>
+
+    <div class="section">
+        <h2>Top 5 Fixes</h2>
+
+        {% for fix in result.diagnosis.top_5_fixes %}
+            <div class="issue">
+                <h3>#{{ fix.rank }} — {{ fix.fix }}</h3>
+                <p class="path">{{ fix.resume_path }}</p>
+                <p>{{ fix.why_it_matters }}</p>
+
+                {% if fix.before %}
+                    <p class="before"><strong>Before:</strong> {{ fix.before }}</p>
+                {% endif %}
+
+                {% if fix.after %}
+                    <p class="after"><strong>After:</strong> {{ fix.after }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>ATS Killers</h2>
+
+        {% for issue in result.diagnosis.ats_killers %}
+            <div class="issue">
+                <h3>
+                    {{ issue.issue_type }}
+                    <span class="badge {{ issue.severity }}">{{ issue.severity }}</span>
+                </h3>
+
+                <p class="path">{{ issue.resume_path }}</p>
+
+                {% if issue.quoted_line %}
+                    <p><strong>Quoted line:</strong> {{ issue.quoted_line }}</p>
+                {% endif %}
+
+                <p><strong>Problem:</strong> {{ issue.explanation }}</p>
+                <p><strong>Fix:</strong> {{ issue.fix }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Missing Keywords</h2>
+
+        {% for keyword in result.recruiter_analysis.top_15_keywords %}
+            <div class="keyword">
+                <strong>#{{ keyword.importance_rank }} — {{ keyword.keyword }}</strong>
+                <span class="badge">{{ keyword.category }}</span>
+                <span class="badge">{{ keyword.status }}</span>
+
+                {% if keyword.resume_path %}
+                    <p class="path">{{ keyword.resume_path }}</p>
+                {% endif %}
+
+                <p>{{ keyword.note }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Bullet Changes</h2>
+
+        {% for change in result.rewrite.bullet_changes %}
+            <div class="change">
+                <p class="path">{{ change.resume_path }}</p>
+
+                <p class="before">
+                    <strong>Before:</strong> {{ change.before }}
+                </p>
+
+                <p class="after">
+                    <strong>After:</strong> {{ change.after }}
+                </p>
+
+                <p><strong>Why stronger:</strong> {{ change.why_stronger }}</p>
+
+                {% if change.keywords_added %}
+                    <p><strong>Keywords added:</strong> {{ change.keywords_added|join:", " }}</p>
+                {% endif %}
+
+                {% if change.needs_metric_from_user %}
+                    <p><strong>Needs metric:</strong> {{ change.metric_question }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Raw JSON Output</h2>
+        <pre>{{ result_json }}</pre>
+    </div>
+</body>
+</html>
